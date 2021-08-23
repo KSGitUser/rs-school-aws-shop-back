@@ -5,12 +5,13 @@ import { formatJSONResponse } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
 
 import schema from './schema';
+import * as productList from './productList.json';
 
 const getProducts: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   console.log(event);
   return formatJSONResponse({
-    products:[{ name: "Picture name"}]
+    products: [...Array.from(productList)]
   });
 }
 
-export const getProductsFunction = middyfy(getProducts);
+export const getProductsList = middyfy(getProducts);

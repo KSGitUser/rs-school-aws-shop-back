@@ -2,12 +2,13 @@
 import { handlerPath } from '@libs/handlerResolver';
 
 export default {
-  handler: `${handlerPath(__dirname)}/handler.getProductsFunction`,
+  handler: `${handlerPath(__dirname)}/handler.getProductsList`,
   events: [
     {
       http: {
         method: 'get',
-        path: 'products',
+        path: 'product',
+        cors: true
         // request: {
         //   schema: {
         //     'application/json': schema
