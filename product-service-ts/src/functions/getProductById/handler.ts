@@ -7,10 +7,11 @@ import { middyfy } from '@libs/lambda';
 import schema from './schema';
 import * as productList from '../../mocked-data/productList.json';
 
-const getProducts: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
+const productsById: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
+  const id = event?.pathParameters?.id
   return formatJSONResponse({
-    products: [...Array.from(productList)]
+    ...Array.from(productList).find(product => product.id === id) || {}
   });
 }
 
-export const getProductsList = middyfy(getProducts);
+export const getProductById = middyfy(productsById);
