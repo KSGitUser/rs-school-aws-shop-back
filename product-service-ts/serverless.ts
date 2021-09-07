@@ -24,6 +24,11 @@ const serverlessConfiguration: AWS = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      PG_HOST: 'rs-lesson4-instance.c5zslgpyiceh.eu-west-1.rds.amazonaws.com',
+      PG_PORT: '5432',
+      PG_DATABASE: 'lesson4',
+      PG_USERNAME: 'postgres',
+      PG_PASSWORD: 't5IJuxwe9Lxh1VJ9A5uh'
     },
     lambdaHashingVersion: '20201221',
   },
