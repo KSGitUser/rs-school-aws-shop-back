@@ -4,6 +4,7 @@ import * as serverlessData from './.serverless/serverless-state.json'
 // import hello from '@functions/hello';
 import products from '@functions/products';
 import getProductById from '@functions/getProductById';
+import postProducts from '@functions/postProducts';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service-ts',
@@ -27,7 +28,7 @@ const serverlessConfiguration: AWS = {
     lambdaHashingVersion: '20201221',
   },
   // import the function via paths
-  functions: { products, getProductById },
+  functions: { products, getProductById, postProducts },
 };
 
 module.exports = serverlessConfiguration;
