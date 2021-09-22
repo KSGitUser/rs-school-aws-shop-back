@@ -18,9 +18,22 @@ provider:
         - "arn:aws:s3:::rsschool-s3-service/*"    
 
 functions: 
-  getFiles:
-    handler: handler.getFiles
+  importProductsFile:
+    handler: handler.importProductsFile
     events:  
       - http: 
           method: GET
-          path: "files/"
+          path: "import/"
+          request: 
+            parameters:
+              querystrings: 
+                name: true
+  importFileParser:
+    handler: handler.importFileParser
+    events: 
+      - s3: 
+          bucket: rsschool-s3-service
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: 'uploaded/'
+          existing: true  
