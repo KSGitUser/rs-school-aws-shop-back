@@ -21,8 +21,6 @@ const getProducts = async (event) => {
     const dbResult = await client.query(`
      select id, title, description, price, count from products p left join stocks s on p.id = s.product_id;
     `);
-    console.log('Connect to DB');
-    console.log(dbResult.rows);
     return formatJSONResponse({
     products: Array.from(dbResult.rows || [])
   });
