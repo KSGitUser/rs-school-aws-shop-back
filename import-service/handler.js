@@ -1,4 +1,5 @@
 const AWS = require('aws-sdk');
+const csv = require('csv-parser');
 const BUCKET = 'rsschool-s3-service';
 
 module.exports = {
@@ -43,25 +44,41 @@ module.exports = {
     return response;
   },
   importFileParser: async function (event) {
-    console.log('event =>', event);
     const s3 = new AWS.S3({ region: 'eu-west-1' });
 
-    for (const record of event.Records) {
-      await s3.copyObject({
-        Bucket: BUCKET,
-        CopySource: BUCKET + '/' + record.s3.object.key,
-        Key: record.s3.object.key.replace('import', 'uploaded')
-      }).promise();
+    console.log("event =>", event.Records)
 
+    try {
+      for (const record of event.Records) {
+        const s3Stream = s3.getObject({
+          Bucket: BUCKET,
+          Key: record.s3.object.key
+        }).createReadStream();
+        console.log('record=> ', record.s3.object)
+        const converted = [];
+        s3Stream.pipe(csv())
+          .on('data', (data) => console.log(data))
+          .on('end', async () => {
 
-      await s3.deleteObject({
-        Bucket: BUCKET,
-        Key: record.s3.object.key
-      }).promise();
+            await s3.copyObject({
+              Bucket: BUCKET,
+              CopySource: BUCKET + '/' + record.s3.object.key,
+              Key: record.s3.object.key.replace('uploaded', 'parsed')
+            }).promise();
 
-      console.log(`Uploaded file ${record.s3.object.key} is created`);
+            await s3.deleteObject({
+              Bucket: BUCKET,
+              Key: record.s3.object.key
+            }).promise();
 
+            console.log(`Uploaded file ${record.s3.object.key} is created`);
+          });
+
+      }
+    } catch (error) {
+      console.error(error);
     }
+
   }
 
 }
