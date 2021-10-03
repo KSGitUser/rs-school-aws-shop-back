@@ -43,34 +43,43 @@ module.exports = {
 
     return response;
   },
-  importFileParser: function (event) {
+  importFileParser: async function (event) {
     const s3 = new AWS.S3({ region: 'eu-west-1' });
 
     try {
       for (const record of event.Records) {
-        const s3Object = s3.getObject({
-          Bucket: BUCKET,
-          Key: record.s3.object.key
-        });
-        const s3Stream = s3Object.createReadStream();
-        const converted = [];
-        s3Stream.pipe(csv())
-          .on('data', (data) => console.log(data))
-          .on('end', async () => {
-
-            await s3.copyObject({
-              Bucket: BUCKET,
-              CopySource: BUCKET + '/' + record.s3.object.key,
-              Key: record.s3.object.key.replace('uploaded', 'parsed')
-            }).promise();
-
-            await s3.deleteObject({
+        await new Promise(
+          (resolve, reject) => {
+            const s3Object = s3.getObject({
               Bucket: BUCKET,
               Key: record.s3.object.key
-            }).promise();
+            });
+            const s3Stream = s3Object.createReadStream();
+            const converted = [];
+            s3Stream.pipe(csv())
+              .on('data', (data) => console.log(data))
+              .on('end', async () => {
+                try {
+                  await s3.copyObject({
+                    Bucket: BUCKET,
+                    CopySource: BUCKET + '/' + record.s3.object.key,
+                    Key: record.s3.object.key.replace('uploaded', 'parsed')
+                  }).promise();
 
-            console.log(`Uploaded file ${record.s3.object.key} is created`);
-          });
+                  await s3.deleteObject({
+                    Bucket: BUCKET,
+                    Key: record.s3.object.key
+                  }).promise();
+
+                  console.log(`Uploaded file ${record.s3.object.key} is created`);
+                  resolve();
+
+                } catch (e) {
+                  reject(e)
+                }
+              })
+              .on('error', (e) => reject(e))
+          })
 
       }
     } catch (error) {
