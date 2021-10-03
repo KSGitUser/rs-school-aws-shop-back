@@ -43,18 +43,16 @@ module.exports = {
 
     return response;
   },
-  importFileParser: async function (event) {
+  importFileParser: function (event) {
     const s3 = new AWS.S3({ region: 'eu-west-1' });
-
-    console.log("event =>", event.Records)
 
     try {
       for (const record of event.Records) {
-        const s3Stream = s3.getObject({
+        const s3Object = s3.getObject({
           Bucket: BUCKET,
           Key: record.s3.object.key
-        }).createReadStream();
-        console.log('record=> ', record.s3.object)
+        });
+        const s3Stream = s3Object.createReadStream();
         const converted = [];
         s3Stream.pipe(csv())
           .on('data', (data) => console.log(data))
