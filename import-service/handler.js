@@ -3,6 +3,18 @@ const csv = require('csv-parser');
 const BUCKET = 'rsschool-s3-service';
 const fetch = require('cross-fetch');
 
+function createProductTopic(data) {
+  const sns = new AWS.SNS({ region: "eu-west-1" });
+
+  sns.publish({
+    Subject: 'Products were added to DB',
+    Message: JSON.stringify(data),
+    TopicArn: process.env.SNS_ARN
+  }, () => {
+    console.log('Send email!')
+  });
+}
+
 module.exports = {
   importProductsFile: async function (event) {
 
@@ -112,20 +124,9 @@ module.exports = {
       const content = await rawResponse.json();
 
       console.log(content);
-      this.createProductTopic(content);
+      createProductTopic(content);
     } catch (e) {
       console.error(e);
     }
-  },
-  createProductTopic: function (data) {
-    const sns = new AWS.SNS({ region: "eu-west-1" });
-
-    sns.publish({
-      Subject: 'Products were added to DB',
-      Mesage: JSON.stringify(data),
-      TopicArn: process.env.SNS_ARN
-    }, () => {
-      console.log('Send email!')
-    })
   }
 }
