@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 const csv = require('csv-parser');
 const BUCKET = 'rsschool-s3-service';
+const fetch = require('cross-fetch');
 
 module.exports = {
   importProductsFile: async function (event) {
@@ -96,8 +97,26 @@ module.exports = {
     }
 
   },
-  catalogBatchProcess: function (event) {
-    const dbRecords = event.Records.map(({ body }) => body)
-    console.log('dbRecords =>', dbRecords);
+  catalogBatchProcess: async function (event) {
+    const dbRecords = event.Records.map(({ body }) => JSON.parse(body))
+    try {
+      console.log('dbRecords =>', dbRecords);
+      const rawResponse = await fetch('https://v1qyqngz3k.execute-api.eu-west-1.amazonaws.com/dev/products', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dbRecords)
+      });
+      const content = await rawResponse.json();
+
+      console.log(content);
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  createProductTopic: function (event) {
+
   }
 }
