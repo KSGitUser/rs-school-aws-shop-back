@@ -16,6 +16,22 @@ provider:
         - "s3:*"
       Resource: 
         - "arn:aws:s3:::rsschool-s3-service/*"    
+    - Effect: "Allow"
+      Action: 
+        - "sqs:*"
+      Resource:
+        - Fn::GetAtt: [ SQSQueue, Arn ]    
+
+  environment:
+    SQS_URL:
+      Ref: SQSQueue
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue      
 
 functions: 
   importProductsFile:
@@ -37,3 +53,12 @@ functions:
           rules:
             - prefix: 'uploaded/'
           existing: true  
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events: 
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn        

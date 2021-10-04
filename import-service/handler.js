@@ -45,6 +45,7 @@ module.exports = {
   },
   importFileParser: async function (event) {
     const s3 = new AWS.S3({ region: 'eu-west-1' });
+    const sqs = new AWS.SQS();
 
     try {
       for (const record of event.Records) {
@@ -57,7 +58,15 @@ module.exports = {
             const s3Stream = s3Object.createReadStream();
             const converted = [];
             s3Stream.pipe(csv())
-              .on('data', (data) => console.log(data))
+              .on('data', (data) => {
+                sqs.sendMessage({
+                  QueueUrl: process.env.SQS_URL,
+                  MessageBody: JSON.stringify(data)
+                }, (error, responseBody) => {
+                  console.log('error =>', error);
+                  console.log('responseBody =>', responseBody);
+                })
+              })
               .on('end', async () => {
                 try {
                   await s3.copyObject({
@@ -86,6 +95,9 @@ module.exports = {
       console.error(error);
     }
 
+  },
+  catalogBatchProcess: function (event) {
+    const dbRecords = event.Records.map(({ body }) => body)
+    console.log('dbRecords =>', dbRecords);
   }
-
 }
