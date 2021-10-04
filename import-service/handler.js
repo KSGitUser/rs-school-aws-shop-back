@@ -112,11 +112,20 @@ module.exports = {
       const content = await rawResponse.json();
 
       console.log(content);
+      this.createProductTopic(content);
     } catch (e) {
       console.error(e);
     }
   },
-  createProductTopic: function (event) {
+  createProductTopic: function (data) {
+    const sns = new AWS.SNS({ region: "eu-west-1" });
 
+    sns.publish({
+      Subject: 'Products were added to DB',
+      Mesage: JSON.stringify(data),
+      TopicArn: process.env.SNS_ARN
+    }, () => {
+      console.log('Send email!')
+    })
   }
 }
