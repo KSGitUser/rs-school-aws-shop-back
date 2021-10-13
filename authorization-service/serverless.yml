@@ -1,0 +1,10 @@
+service: rsschool-s3-authorization-service
+
+provider: 
+  name: aws
+  runtime: nodejs14.x
+  region: "eu-west-1"
+
+functions: 
+  basicAuthorizer:
+    handler: handler.basicAuthorizer
