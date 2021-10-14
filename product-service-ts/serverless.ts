@@ -1,8 +1,10 @@
 import type { AWS } from '@serverless/typescript';
+import * as serverlessData from './.serverless/serverless-state.json'
 
 // import hello from '@functions/hello';
 import products from '@functions/products';
 import getProductById from '@functions/getProductById';
+import postProducts from '@functions/postProducts';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service-ts',
@@ -22,13 +24,11 @@ const serverlessConfiguration: AWS = {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
     },
-    environment: {
-      AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-    },
+    environment: Object(serverlessData).service.provider.environment,
     lambdaHashingVersion: '20201221',
   },
   // import the function via paths
-  functions: { products, getProductById },
+  functions: { products, getProductById, postProducts },
 };
 
 module.exports = serverlessConfiguration;
