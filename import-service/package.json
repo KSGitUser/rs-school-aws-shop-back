@@ -1,0 +1,12 @@
+{
+  "name": "import-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.993.0",
+    "csv-parser": "^3.0.0",
+    "global": "^4.4.0",
+    "serverless": "^2.59.0"
+  }
+}
