@@ -1,0 +1,7 @@
+{
+  "name": "bff-service",
+  "version": "1.0.0",
+  "main": "app.js",
+  "author": "KSGitUser",
+  "license": "MIT"
+}
